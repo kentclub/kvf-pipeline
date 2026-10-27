@@ -5,10 +5,13 @@ Build manual for the daily "Kent vs Fat" Short (1080x1920, 30 fps). Input is one
 ## Setup
 
 ```
-git clone https://github.com/kentclub/kvf-pipeline && cd kvf-pipeline && bash setup.sh
+git clone https://github.com/kentclub/kvf-pipeline && cd kvf-pipeline
+mkdir -p raw work sheets stills
+pip install --break-system-packages faster-whisper pillow-heif numpy pillow
+(cd kvf-video && npm i --no-audit --no-fund)
 ```
 
-Needs ffmpeg, python3, node 20+. Fonts are in `kvf-video/public/fonts`. Resemble Enhance (own-voice cleanup) is a separate `bash setup_enhance.sh`, only when a voice memo exists.
+`setup.sh` runs the same three lines. Needs ffmpeg, python3, node 20+. Fonts are in `kvf-video/public/fonts`. Resemble Enhance (own-voice cleanup) is a separate `bash setup_enhance.sh`, only when a voice memo exists.
 
 ## Inputs
 
@@ -79,7 +82,7 @@ See `examples/script.json`. Fields:
 
 ## Posting (Metricool, brand 7360889, brand timezone America/New_York)
 
-- Final and cover go into `KvF Inbox` (device_commit_files to `/Users/kent/Library/CloudStorage/GoogleDrive-kentozcelik@gmail.com/My Drive/KvF Inbox/` through the Mac). Read their ids from the folder page, media = `https://drive.usercontent.google.com/download?id=<id>&export=download&confirm=t`, `videoThumbnailUrl` = the cover link.
+- Final and cover go into `KvF Inbox` (device_commit_files through the Mac; the folder's path on the Mac is in the task prompt). Read their ids from the folder page, media = `https://drive.usercontent.google.com/download?id=<id>&export=download&confirm=t`, `videoThumbnailUrl` = the cover link.
 - YouTube Short: public, not for kids, PEOPLE_BLOGS, tags `skinny fat, fat loss, cutting, AI coach`. Instagram Reel on feed. `instagramData.isAiGenerated` and `youtubeData.isAiGeneratedContent` stay false.
 - Caption:
   ```
