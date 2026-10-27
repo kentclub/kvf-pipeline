@@ -1,0 +1,24 @@
+# media and per-day work, never committed
+raw/
+work/
+sheets/
+stills/
+day*/
+inventory.json
+*.part
+*.mp4
+*.mov
+*.MOV
+*.wav
+*.mp3
+*.jpg
+*.png
+*.heic
+*.HEIC
+
+# build
+kvf-video/node_modules/
+kvf-video/public/day*/
+kvf-video/out/
+.remotion/
+__pycache__/

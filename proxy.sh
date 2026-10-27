@@ -1,0 +1,3 @@
+# usage: proxy.sh NAME [start] [dur]  -> work/NAME.mp4 (1080x1920, 30fps, h264)
+n=$1; ss=${2:-0}; t=${3:-}
+ffmpeg -hide_banner -loglevel error -y -ss $ss ${t:+-t $t} -i raw/$n.MOV -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30" -c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p -c:a aac -b:a 160k -ar 48000 -movflags +faststart work/$n.mp4 && echo "$(date +%T) done $n"

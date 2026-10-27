@@ -1,0 +1,121 @@
+{
+ "day": 26,
+ "date": "2026-10-23",
+ "opener": "81442096009",
+ "opener_hint": "Day 26 of following AI until I reach 10% body fat.",
+ "cover": {
+  "hook": "Losing fat with *popcorn*",
+  "at": 2.0
+ },
+ "lines": [
+  {
+   "text": "I ate carefully all day, and then a popcorn bucket at the cinema took half my deficit.",
+   "visual": {
+    "clip": "81442361023",
+    "start": 20,
+    "tag": "GYM DAY"
+   }
+  },
+  {
+   "text": "Gym day, so a short bike warm-up, then weights.",
+   "visual": {
+    "clips": [
+     "81442306552",
+     "81442424889"
+    ],
+    "starts": [
+     0,
+     10
+    ]
+   }
+  },
+  {
+   "text": "A banana before the gym and a whey shake when I got home.",
+   "visual": {
+    "clip": "81443002618"
+   }
+  },
+  {
+   "text": "Lunch was four eggs with lor, protein kaşar, olives and vegetables.",
+   "visual": {
+    "clip": "81444113629"
+   }
+  },
+  {
+   "text": "For the snack I made chocolate protein pancakes with a quark chocolate topping.",
+   "visual": {
+    "clip": "81445681834"
+   }
+  },
+  {
+   "text": "The plan was half the topped batch. I ate about a fifth, and my wife ended up eating almost all of it when I came back.",
+   "visual": {
+    "clips": [
+     "81419293917",
+     "81445681834"
+    ],
+    "starts": [
+     0,
+     1.0
+    ]
+   }
+  },
+  {
+   "text": "Dinner was rice with yesterday's chicken stir fry and some bean sprouts.",
+   "visual": {
+    "clip": "81446139908"
+   }
+  },
+  {
+   "text": "In the evening my wife and I went to the cinema and shared a popcorn bucket.",
+   "visual": {
+    "clip": "81446418663"
+   }
+  },
+  {
+   "text": "I thought half a popcorn would be enough to enjoy it and still keep a deficit.",
+   "visual": {
+    "clip": "81446418663",
+    "start": 3
+   }
+  },
+  {
+   "text": "It still ended under maintenance.",
+   "visual": {
+    "card": "totals",
+    "kcal": 2205,
+    "protein": 186,
+    "deficit": 320,
+    "over": {
+     "clip": "81442424889",
+     "start": 50
+    }
+   }
+  },
+  {
+   "text": "That's seven days in a row under maintenance, even with the popcorn.",
+   "visual": {
+    "clip": "81442264701"
+   }
+  },
+  {
+   "text": "Just over a kilo of fat gone so far, about a tenth of the way.",
+   "visual": {
+    "card": "progress",
+    "kg": 1.05,
+    "of": 10.4,
+    "pct": 10.1,
+    "over": {
+     "clip": "81442264701",
+     "start": 7
+    }
+   }
+  },
+  {
+   "text": "Tomorrow: a raclette night with wine and dessert.",
+   "visual": {
+    "clip": "81454941102"
+   }
+  }
+ ]
+}
