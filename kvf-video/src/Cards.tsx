@@ -217,7 +217,7 @@ export const DayTag: React.FC<{ text: string }> = ({ text }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   return (
-    <div style={{ position: "absolute", top: 200, left: 80, ...appear(frame, fps, 0) }}>
+    <div style={{ position: "absolute", top: 200, left: 80, right: 80, display: "flex", ...appear(frame, fps, 0) }}>
       <div
         style={{
           background: "rgba(14,15,12,0.85)",

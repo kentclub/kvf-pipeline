@@ -13,6 +13,7 @@ Needs ffmpeg, python3, node 20+. Fonts are in `kvf-video/public/fonts`. Resemble
 ## Inputs
 
 - Clips: Google Drive folder "KvF Inbox", id `1XWR-6tQkJRUD0FrMcbpdEdl2HKrFUOlh`, shared "anyone with the link: viewer". `python3 sync.py` lists it through `drive.google.com/embeddedfolderview` and downloads with `drive.usercontent.google.com`, no Mac or connector needed. `ONLY=name1,name2 python3 sync.py` fetches only those files. Finished videos (`dayN_*`) and subfolders are skipped. Older clips live in `KvF Inbox/_done` and are only reachable through the Mac.
+- `KvF Inbox/_done` is also publicly listable (folder id `1z-QSci1srTtsFzl4ZPahYiZOvXXhfhQJ`) and its files download with the same `drive.usercontent` link, so older clips do not need the Mac. The Mac is only needed to write finals into the inbox and to move files into `_done`.
 - Raw names look like `<id>__<UUID>.MOV`. Symlink each to `raw/<id>.MOV` before `proxy.sh`.
 - `IMG_0624.JPG` in the inbox root is the "last year" photo used by the opener. Keep it there.
 - Episode row page body (written by the scriptwriter task):
@@ -20,6 +21,13 @@ Needs ffmpeg, python3, node 20+. Fonts are in `kvf-video/public/fonts`. Resemble
   - `## Shot list`: table with start s, end s, spoken line, clip id, visual type, on-screen text. One row per segment.
   - `## Cover`: hook text (3 to 5 words, one word in *stars*), clip id, second.
   - `## Guardrails`: things this episode must not do. Hard rules.
+
+## Shot list to script.json
+
+- The shot list's start and end seconds are targets. Real timing comes from `align.py` on the actual voice; a 1.1x clone usually runs shorter than the list.
+- A clip that appears several times in the shot list gets a different `start` each time.
+- A card row whose on-screen text does not carry the card's numbers (totals need kcal, protein, deficit; progress needs kg, of, pct) is rendered as a text panel over the clip with the on-screen text verbatim. Never invent numbers for a card.
+- On-screen text is rendered verbatim, including parentheses.
 
 ## Daily build
 
