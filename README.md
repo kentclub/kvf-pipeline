@@ -15,8 +15,8 @@ pip install --break-system-packages faster-whisper pillow-heif numpy pillow
 
 ## Inputs
 
-- Clips: Google Drive folder "KvF Inbox", id `1XWR-6tQkJRUD0FrMcbpdEdl2HKrFUOlh`, shared "anyone with the link: viewer". `python3 sync.py` lists it through `drive.google.com/embeddedfolderview` and downloads with `drive.usercontent.google.com`, no Mac or connector needed. `ONLY=name1,name2 python3 sync.py` fetches only those files. Finished videos (`dayN_*`) and subfolders are skipped. Older clips live in `KvF Inbox/_done` and are only reachable through the Mac.
-- `KvF Inbox/_done` is also publicly listable (folder id `1z-QSci1srTtsFzl4ZPahYiZOvXXhfhQJ`) and its files download with the same `drive.usercontent` link, so older clips do not need the Mac. The Mac is only needed to write finals into the inbox and to move files into `_done`.
+- Clips: Google Drive folder "KvF Inbox", id `1XWR-6tQkJRUD0FrMcbpdEdl2HKrFUOlh`, shared "anyone with the link: viewer". `python3 sync.py` lists it through `drive.google.com/embeddedfolderview` and downloads with `drive.usercontent.google.com`, no Mac or connector needed. `ONLY=name1,name2 python3 sync.py` fetches only those files. Finished videos (`dayN_*`) and subfolders are skipped. Older clips live in `KvF Inbox/_library`. Every clip has a catalog line in `KvF Inbox/_system/clips.jsonl` (see `docs/catalog.md`): read that before touching any video.
+- `KvF Inbox/_library` is also publicly listable (folder id `1elH-0SsafL5ucmxOtn19IgRjdDYJX3qs`) and its files download with the same `drive.usercontent` link, so older clips do not need the Mac. The Mac is only needed to write finals into the inbox and to move files into `_library`.
 - Raw names look like `<id>__<UUID>.MOV`. Symlink each to `raw/<id>.MOV` before `proxy.sh`.
 - `IMG_0624.JPG` in the inbox root is the "last year" photo used by the opener. Keep it there.
 - Episode row page body (written by the scriptwriter task):
@@ -94,11 +94,11 @@ See `examples/script.json`. Fields:
   ```
   "kg to go" = 10.4 minus fat lost so far, never the 10.4 total. Numbers come from the row's related Daily Life Log entry.
 - Mac unreachable: Notion uploads cap at 20 MiB. Re-encode if needed (`-b:v 3900k`, two-pass), upload the final and the cover to the episode row with `notion-create-file-upload`, embed them, get signed links with `notion-get-file-download-urls`, schedule within 5 minutes. Metricool copies the media at creation.
-- After scheduling: move that day's clips, memo, final and cover into `KvF Inbox/_done` (finals in `_done/finals`). Metricool already has its copy.
+- After scheduling: move that day's clips and memo into `KvF Inbox/_library`, the final and cover into `KvF Inbox/_finals`, and write the `used` lines into `_system/described/` (docs/catalog.md). Metricool already has its copy.
 
 ## Known traps
 
 - Hinted Whisper passes can skip whole sentences (Day 16 captions ran 2.4 s late). `align.py` tries plain first and refuses under 90% coverage; `check_sync.py` is the second guard.
 - faster-whisper cannot open file paths with the installed `av`. The scripts pass numpy arrays.
 - Rebuilt voices (Resemble Enhance) can change a word. Compare the transcript with the script before aligning.
-- Staging a 30 MB+ MOV from `_done` through the Mac times out. Make short proxies on the Mac first.
+- Staging a 30 MB+ MOV from `_library` through the Mac times out. Make short proxies on the Mac first.
