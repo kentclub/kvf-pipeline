@@ -23,10 +23,12 @@ The clip id is the number before `__` in the iPhone file name (`81490370418__197
 
 ## Who does what
 
-- Mac, launchd job `com.kvf.ingest` at 06:30 and 18:30 (`ingest/kvf_ingest.py`), no Claude, no tokens:
+- Mac, launchd job `com.kvf.ingest` at 06:30 and 18:30 (`ingest/kvf_ingest.py`, plist in `ingest/`, installed in `~/Library/LaunchAgents`; the Python binary needs Full Disk Access or the Drive folder reads fail with EPERM), no Claude, no tokens:
   merge `described/*.jsonl` into `clips.jsonl`, drop pending entries that are now cataloged, then for each new video in the root (and in `_library` with `--all`): md5, ffprobe, contact sheet, whisper.cpp transcript, write `pending/<id>.json`. Then housekeeping: root videos older than 48 h move to `_library`, `_proxies` files older than a day are trashed.
 - Scriptwriter (cloud, 09:09): reads `clips.jsonl` and `pending/*.json`. For pending clips it looks at the sheets and writes one description line each into `described/<timestamp>.jsonl` (Drive connector `create_file`, parent = the `described` folder). Uses the catalog to pick the day's clips and any older B-roll by `loc` and `desc`.
 - Builder (cloud, 18:55): reads `clips.jsonl` to confirm what a clip shows (no inventory2 pass needed for cataloged clips). After scheduling, writes `{"id": "...", "used": [N]}` lines into `described/` for the clips it cut in.
+
+Folder ids: root 1XWR-6tQkJRUD0FrMcbpdEdl2HKrFUOlh, _library 1elH-0SsafL5ucmxOtn19IgRjdDYJX3qs, _finals 11_aagq0MihGCpWBQvcy84E1tzq1CiS_A, _system 1pNNpsnM1Q5LzkFz9eb6DJZv2yXqbUBPf, pending 1Jd8iUbuHyDg7PoBxsw3iR5GWaBuoqYDb, sheets 1zTFwR7FaJj2QjYfg2ksesHGprGKlQ6H-, described 1vintE3bzlXlkaVDMb9fwBVAdmyiXdK8Z. The catalog file itself gets a new id if it is ever recreated; list `_system` to find it.
 
 Cloud tasks read `_system` files through the public folder links (same pattern as `sync.py`: list with `https://drive.google.com/embeddedfolderview?id=<folder id>`, download with `https://drive.usercontent.google.com/download?id=<file id>&export=download&confirm=t`), or through the Google Drive connector. They write only into `described/`.
 
