@@ -210,6 +210,45 @@ def videos(folder):
     return out
 
 
+def merge_described():
+    """Cloud tasks cannot append to clips.jsonl in place (the Drive connector only
+    creates files), so they drop one-off files into _system/described/*.jsonl.
+    This merges them into the catalog, then removes the pending json of every
+    cataloged id. Last line per id wins when reading the catalog."""
+    desc_dir = f'{SYSTEM}/described'
+    os.makedirs(desc_dir, exist_ok=True)
+    files = sorted(f for f in os.listdir(desc_dir) if f.endswith('.jsonl'))
+    added = 0
+    with open(CATALOG, 'a') as cat:
+        for f in files:
+            p = f'{desc_dir}/{f}'
+            for line in open(p):
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    d = json.loads(line)
+                    assert 'id' in d
+                except Exception:
+                    log('bad described line in', f, line[:80]); continue
+                cat.write(json.dumps(d, ensure_ascii=False) + '\n'); added += 1
+            os.remove(p)
+    if added:
+        log(f'merged {added} described lines from {len(files)} files')
+    # prune pending entries that are now in the catalog
+    ids = set()
+    if os.path.exists(CATALOG):
+        for line in open(CATALOG):
+            try: ids.add(json.loads(line)['id'])
+            except Exception: pass
+    pruned = 0
+    for f in os.listdir(PENDING):
+        if f.endswith('.json') and f[:-5] in ids:
+            os.remove(f'{PENDING}/{f}'); pruned += 1
+    if pruned:
+        log(f'pruned {pruned} pending entries already in the catalog')
+
+
 def housekeeping():
     now = time.time()
     moved = 0
@@ -241,6 +280,7 @@ def main():
             limit = int(a.split('=')[1])
     if not os.path.isdir(DRIVE):
         log('ERROR drive folder missing', DRIVE); sys.exit(1)
+    merge_described()
     known = known_ids()
     todo = [(p, 'inbox') for p in videos(DRIVE)]
     if do_all:
