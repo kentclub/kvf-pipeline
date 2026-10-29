@@ -218,6 +218,11 @@ def merge_described():
     desc_dir = f'{SYSTEM}/described'
     os.makedirs(desc_dir, exist_ok=True)
     files = sorted(f for f in os.listdir(desc_dir) if f.endswith('.jsonl'))
+    cataloged = set()
+    if os.path.exists(CATALOG):
+        for line in open(CATALOG):
+            try: cataloged.add(json.loads(line)['id'])
+            except Exception: pass
     added = 0
     with open(CATALOG, 'a') as cat:
         for f in files:
@@ -231,7 +236,16 @@ def merge_described():
                     assert 'id' in d
                 except Exception:
                     log('bad described line in', f, line[:80]); continue
+                # first line for a clip: fold the Mac's pending facts in, so the
+                # catalog line is complete on its own
+                pj = f'{PENDING}/{d["id"]}.json'
+                if d['id'] not in cataloged and os.path.exists(pj):
+                    try:
+                        base = json.load(open(pj)); base.update(d); d = base
+                    except Exception as e:
+                        log('pending read failed', pj, e)
                 cat.write(json.dumps(d, ensure_ascii=False) + '\n'); added += 1
+                cataloged.add(d['id'])
             os.remove(p)
     if added:
         log(f'merged {added} described lines from {len(files)} files')
