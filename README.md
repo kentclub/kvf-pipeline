@@ -1,5 +1,7 @@
 # kvf-pipeline
 
+Start with `docs/SYSTEM.md`: the map of the whole system (parts, daily timeline, where state lives, what to check when it breaks). This file is the build manual only.
+
 Build manual for the daily "Kent vs Fat" Short (1080x1920, 30 fps). Input is one approved episode row in the Notion table "KvF · Content & Analytics". Output is `dayN/dayN_final.mp4` and `dayN/dayN_cover.jpg`. This repo does not decide what the video says; the script, the shot list and the cover come from the Notion row.
 
 ## Setup

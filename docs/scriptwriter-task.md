@@ -19,7 +19,7 @@ Query the Life log for rows with Log status = Final and Log date up to yesterday
 2. READ (silent)
 - Fetch the target Life log page (properties and full body) and the Life log row for the next day if it exists (for the teaser).
 - Fetch the three most recent episode rows (by Episode number) and read their Script and Caption: continuity, the "Fat lost so far" chain, and hook angles not to repeat.
-- `git clone https://github.com/kentclub/kvf-pipeline ~/kvf` (public). Read README.md sections "Inputs", "Shot list to script.json", "script.json" and "Style rules", and docs/catalog.md.
+- `git clone https://github.com/kentclub/kvf-pipeline ~/kvf` (public). Read docs/SYSTEM.md first (the map of the whole system), then read README.md sections "Inputs", "Shot list to script.json", "script.json" and "Style rules", and docs/catalog.md.
 
 3. CLIPS (silent)
 a. Download `_system/clips.jsonl` and list `_system/pending/`. Download every pending json (they are tiny).
