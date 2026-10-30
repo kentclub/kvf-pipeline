@@ -39,6 +39,7 @@ Series rules on top of the skill:
 - Every fact and number comes from the Life log row. Numbers that a card will show (kcal, protein, deficit, kg lost) are not spoken; say "under maintenance" and let the card carry them. Counts in the story (five desserts, twelve reps) are fine to say.
 - Estimates stay estimates: "AI estimated", "about". The AI coach decision is an observation or an advice given; never invent a new coach instruction, a feeling, or a thought Kent did not log (Reflection is the only source for those).
 - No city names. No "in this video". No greeting. Monday videos: the README describes a weekly recap format; use it only when this run's instructions say so, otherwise write the normal daily episode.
+- The audience is English-speaking. Never use Turkish food names in voice or on screen; describe the dish so a non-Turkish viewer understands it (e.g. Kilis tava = a tray of spiced minced meat). Exception: lahmacun is said as "Turkish lahmacun". French food names are fine. Name one thing one way across the whole script (never bread, then lavash, then wrap). When something matters to the story, say why in plain words (e.g. "my calorie estimate didn't include the bread").
 
 5. SHOT LIST, COVER, CAPTION, GUARDRAILS
 Page body, in this order, with these exact headings:
