@@ -1,0 +1,34 @@
+Nightly analytics refresh of the Notion episodes table "KvF · Content & Analytics" (data source collection://d77ad7ef-88c0-466a-8380-fc9458830eac). Kent vs Fat is Kent's daily Instagram Reels + YouTube Shorts channel ("Day N of following AI until I reach 10% body fat"). You only write performance fields: Status (Scheduled → Posted only), IG URL, YT URL, IG published at, YT published at, the 2d/7d snapshot columns and the YT "first 2d"/"first 7d" watch columns. Never touch production fields (Episode, Hook, Story angle, Opening visual, Video length s, Life log, page body). Never create or delete episode rows, never post anything, never message anyone but Kent. Times: Europe/Istanbul.
+
+0. Fetch the data source, then query all rows with Status in Scheduled or Posted. Also query "KvF · Operations" (collection://73f203a3-68c5-49b7-bb57-9ec5675887a3) for open rows with Component = Analytics, so you can update rather than duplicate them.
+
+1. INSTAGRAM via Metricool: getAnalyticsDataByMetrics, brandId 7360889, from 2026-09-25 to now, metrics ["IGRE02","IGRE06","IGRE23","IGRE24","IGRE28","IGRE09","IGRE03"] = timestamp (UTC), reel URL, views, average watch time s, reel view rate (% of views over 3 s), interactions, caption. Match each reel to a row: by the row's IG URL, else by "Day N" in the caption, else by timestamp within 12 h of the row's IG published at. Fill IG URL if empty and IG published at if empty (the reel's real publish time, Istanbul). Metricool's Instagram data arrives 3 to 30 hours after posting; a reel missing from Metricool while getScheduledPosts shows its Instagram provider as PUBLISHED is lag, not a failure: take its URL from getScheduledPosts (providers[].publicUrl).
+
+2. YOUTUBE views via Chrome (Claude in Chrome on Kent's Mac). Open a new tab at https://www.youtube.com/channel/UCLKOOOW32CCYvvmWiNnyzWQ/shorts and run in the page:
+const out=[];const walk=o=>{if(!o||typeof o!=='object')return;if(o.shortsLockupViewModel){const s=o.shortsLockupViewModel;out.push((s.overlayMetadata?.primaryText?.content||'')+'|'+s.onTap?.innertubeCommand?.reelWatchEndpoint?.videoId+'|'+(s.overlayMetadata?.secondaryText?.content||''));}for(const k in o)walk(o[k]);};walk(window.ytInitialData);out.join('\n')
+Match by video id in the row's YT URL, else by "Day N" in the title. Fill YT URL (https://www.youtube.com/shorts/<id>) if empty. Counts under 1,000 on that page are exact. For an abbreviated count (1.2K) that a snapshot needs, open https://www.youtube.com/watch?v=<id> in the same tab and read the exact number from ytInitialPlayerResponse.videoDetails.viewCount. Do not use YouTube Studio (Chrome is signed into another account there). Close the tab when done. YT published at, if empty: the publish date from the watch page (ytInitialPlayerResponse.microformat.playerMicroformatRenderer.publishDate) at 20:00 Istanbul unless the page shows a time.
+If Chrome is unreachable, YT views snapshots stay empty for that night (Metricool's YouTube data is days late and cannot serve a 2d or 7d view count); say so in the summary and log it per 6c.
+
+3. YOUTUBE watch time via Metricool (windowed, filled late on purpose). Metricool's per-video YouTube data comes in daily buckets and arrives 2 to 5 days late, so it is never read at a fixed age. Instead each value covers a fixed window of days after publishing and is written once that window's data exists, whenever that is.
+ a. Find the latest day Metricool has: query metrics ["YTVV05","YTVV06"] for single days, going back from yesterday, until one returns rows. Call it LAST.
+ b. For each Posted row with a YT URL, D = the YT published at date (Istanbul). 
+  - "YT avg watch s first 2d" empty and LAST >= D+1: query from D 00:00 to D+1 23:59 (+03:00), metrics ["YTVV05","YTVV06","YTVV07"] (URL, views, watch minutes). For the row's video: avg s = watch minutes × 60 / views, 1 decimal. Write it, plus "YT stayed % first 2d" = avg s / Video length s × 100, 1 decimal (only if Video length s exists).
+  - "YT avg watch s first 7d" empty and LAST >= D+6: same with D to D+6, into the "first 7d" columns.
+  - Video has no row in that range although LAST covers it, or views = 0: leave empty and mention it.
+ c. Stall check: if LAST is more than 5 days before today, Operations row (Component Analytics, Issue "Metricool YouTube data stalled", Symptoms = LAST and today) or update the open one. If a row's first-2d value is still empty 10 days after D, mention it in the summary.
+
+4. SNAPSHOTS (cumulative values read at a fixed age), written once, never overwritten, never backfilled late. Days since post = Istanbul calendar days between the platform's published at and today.
+- 2d window: days since post is 2 or 3 and "<platform> checked at 2d" is empty. Write IG views 2d, IG 3s hold % 2d, IG avg watch s 2d, IG interactions 2d, IG checked at 2d = today; and YT views 2d, YT checked at 2d = today.
+- 7d window: days since post is 7, 8 or 9 and "<platform> checked at 7d" is empty. Same fields with the 7d suffix.
+- A row inside a window whose metric is not available yet (e.g. the reel is not in Metricool yet): write nothing for that platform and retry the next night while the window is open. On the window's last day, write what you have, set checked at, and mention the gap.
+- Outside the windows write nothing. A row that missed its window stays empty. The YT "first 2d/7d" watch columns are not snapshots; step 3 governs them.
+Numbers: 1 decimal for percentages and seconds, integers for views and interactions.
+
+5. STATUS: a Scheduled row whose post is found live on Instagram or YouTube (or shown PUBLISHED by getScheduledPosts) becomes Posted, with both URLs and published at filled as far as known. A Scheduled row whose IG published at is more than 6 hours in the past and still has no live post anywhere: leave Scheduled, add an Operations row (Issue "Scheduled post not live: Day N", Component Publishing, Status Open, Related video = the row, First observed and Last observed = today, Symptoms = what Metricool getScheduledPosts shows for it).
+
+6. CHECKS (report, do not fix):
+ a. Outlier: any video posted in the last 3 days whose IG or YT views are 3x or more of that platform's median across all Posted rows. Name it with both numbers and the median; it means Kent should post a Part 2 within 24 to 48 h and pin a comment.
+ b. A reel or Short found on Instagram or YouTube with no matching episode row, published on or after 2026-10-25 (Day 26). Older videos predate the table and are not reported.
+ c. Any step that failed (Metricool, Chrome, Notion): one Operations row each (Component Analytics; update the existing open row for the same issue instead of adding one). Metricool lag inside the ranges above is not a failure.
+
+7. Finish with a 2 to 5 line summary: rows updated, snapshots written, YT watch windows filled (and LAST), status changes, each check's result. If a, b and c are all empty, the last line is exactly "No action needed."

@@ -16,7 +16,7 @@ Kent vs Fat is a daily Short (YouTube Shorts + Instagram Reels), series line "Da
 | Logger task | Copies yesterday's food, workout, weight and AI verdict from memory into Notion | "KvF: Daily Meal/Workout Logger to Notion", 04:39 |
 | Scriptwriter task | Writes the episode row: script, shot list, cover, caption, guardrails. Describes new clips into the catalog. Waits for Kent's yes | "KvF: Daily Scriptwriter", 09:09. Prompt: `docs/scriptwriter-task.md` |
 | Builder task | Builds the video from the approved row (voice, align, Remotion render, cover), sends it to Kent, schedules it in Metricool after his OK, files the clips | "KvF: Daily Short Creator v3", 18:55, bound to the Mac. Prompt: `docs/short-creator-task.md`. Manual: `README.md` |
-| Analytics task | Fills views, watch time and URLs at 2 and 7 days; flips Scheduled → Posted | "KvF: Analytics Check", 23:16 |
+| Analytics task | Nightly: URLs, Scheduled → Posted, view snapshots at 2 and 7 days, YouTube watch time per fixed window once Metricool has it (see "Metrics: sources and delays") | "KvF: Analytics Check", 23:16. Prompt: `docs/analytics-task.md` |
 | Notion | The running data. Three tables | Daily Life Log `collection://1b074723-f172-4b16-81bf-4d1cd4447e05`, Content & Analytics `collection://d77ad7ef-88c0-466a-8380-fc9458830eac`, Operations `collection://73f203a3-68c5-49b7-bb57-9ec5675887a3` |
 | Metricool | Scheduling and posting to YouTube and Instagram | brand 7360889, timezone America/New_York |
 | Repo | All code, prompts and docs | github.com/kentclub/kvf-pipeline, public |
@@ -33,10 +33,27 @@ all day   phone → Drive root            Kent films, uploads land in KvF Inbox
 18:55     Builder                       catalog → proxies on the Mac → voice → render → sends video to Kent (Ready to publish)
           Kent: "yes"                   schedule in Metricool for 20:00 → row Scheduled; clips → _library, final → _finals; used lines → described
 20:00     Metricool                     posts to YouTube and Instagram
-23:16     Analytics                     Scheduled → Posted, URLs, 2d/7d numbers on the right days
+23:16     Analytics                     Scheduled → Posted, URLs, 2d/7d snapshots, YT watch windows once their data exists
 ```
 
 Weekends get no separate video; Monday's video is the weekly recap (scan day).
+
+## Metrics: sources and delays
+
+Measured 29 to 30 Oct 2026. Design every metric around when its source can actually deliver it.
+
+| Metric | Source | Delay | How it is recorded |
+| --- | --- | --- | --- |
+| IG views, 3 s hold %, avg watch, interactions | Metricool Instagram reels (IGRE*) | 3 to 30 h after posting | Cumulative snapshot at day 2 to 3 and day 7 to 9 ("IG ... 2d / 7d"). Missing = lag: retry next night while the window is open |
+| IG / YT post URL, live or not | Metricool getScheduledPosts (providers[].status, publicUrl) | Immediate | Fills URLs and Posted status even before analytics data exists |
+| YT views | YouTube channel page via Chrome (public counts) | Live | Cumulative snapshot at day 2 to 3 and 7 to 9 ("YT views 2d / 7d"). Metricool YT views are days old: never use them for snapshots |
+| YT avg view duration, stayed % | Metricool YouTube "all videos" (YTVV05 URL, YTVV06 views, YTVV07 watch minutes), daily buckets | 2 to 5 days (newest day with data = LAST) | Fixed window, filled late: "first 2d" = days D and D+1, "first 7d" = D to D+6 (D = YT publish date). avg s = watch minutes x 60 / views. Ready around day 4 to 7 and 9 to 12 |
+
+Traps:
+- Metricool YouTube metrics are range-based: YTVV06/YTVV08 sum or average only the days inside from/to. A wide range gives lifetime numbers, a narrow one gives that window. That is what makes windowed watch time possible.
+- YTVV08 (avg view duration) is rounded to whole seconds; compute from YTVV07 and YTVV06 for 1 decimal.
+- YouTube Studio in Chrome is signed into another account: do not use it.
+- A metric that lands days late must never be inside a "read at age N" snapshot. Name it by the window it covers and fill it when the window's data exists.
 
 ## Where state lives
 
@@ -66,6 +83,8 @@ Weekends get no separate video; Monday's video is the weekly recap (scan day).
 | Public link download fails | The file was recreated and has a new id | List the parent folder with embeddedfolderview and take the current id |
 | Post not live at 20:00 | Metricool rejected the media, or the Scheduled row was never confirmed | Metricool planner; Operations row "Scheduled post not live" |
 | Captions out of sync | Whisper skipped a sentence | `check_sync.py` output; README "Known traps" |
+| Reel missing from analytics the night after posting | Metricool Instagram lag (3 to 30 h) | getScheduledPosts shows the IG provider PUBLISHED; retry next night |
+| YT watch time columns empty | Metricool YouTube lag (2 to 5 days), filled later by design | Newest day Metricool returns for YTVV05/YTVV06; more than 5 days behind = stalled, reconnect YouTube in Metricool |
 | Disk full on the Mac | Proxies or frames not cleaned, or something unrelated | `df -h`; `_proxies` on Drive; `~/kvf/frames` |
 
 ## Reading order for a new agent
@@ -73,5 +92,5 @@ Weekends get no separate video; Monday's video is the weekly recap (scan day).
 1. This file.
 2. `docs/catalog.md` if you touch clips.
 3. `README.md` if you build video.
-4. Your own task prompt (`docs/*-task.md`).
+4. Your own task prompt (`docs/*-task.md`). Anything touching numbers: "Metrics: sources and delays" above.
 5. The Operations table for anything that already went wrong.
