@@ -112,8 +112,7 @@ export const DayVideo: React.FC<DayProps> = (p) => {
             body = (
               <>
                 <Clip dir={p.dir} name={v.clip} start={v.start} clipSec={p.clips[v.clip]} slotFrames={dur} />
-                {v.tag ? <DayTag text={v.tag} /> : null}
-              </>
+                {v.tag ? (i === 0 && !op ? <div style={{ position: "absolute", inset: 0, translate: "0px 180px" }}><DayTag text={v.tag} /></div> : <DayTag text={v.tag} />) : null}              </>
             );
           } else if ("clips" in v) {
             const part = Math.floor(dur / v.clips.length);
