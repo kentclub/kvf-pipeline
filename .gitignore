@@ -22,3 +22,5 @@ kvf-video/public/day*/
 kvf-video/out/
 .remotion/
 __pycache__/
+lessons*/
+kvf-video/public/lessons*/

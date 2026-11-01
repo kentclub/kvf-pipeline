@@ -16,6 +16,7 @@ export type DayProps = {
   dir: string;
   day: number;
   goalText: string;
+  badge?: string; // badge text when not "DAY N" (e.g. "DAY 30 / 365"); shown small from frame 0, no big opener badge
   clips: Record<string, number>; // clip name -> duration in seconds
   lines: { text: string; visual: Visual }[];
   opener: { src: string; trimMs?: number; durationMs: number; captions: Cap[]; thisMs: number[] } | null;

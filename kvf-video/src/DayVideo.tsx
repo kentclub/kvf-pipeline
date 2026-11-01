@@ -35,7 +35,7 @@ const Clip: React.FC<{ dir: string; name: string; clipSec: number; slotFrames: n
   );
 };
 
-const DayBadge: React.FC<{ day: number; big: boolean }> = ({ day, big }) => (
+const DayBadge: React.FC<{ day: number; big: boolean; text?: string }> = ({ day, big, text }) => (
   <div
     style={{
       position: "absolute",
@@ -58,7 +58,7 @@ const DayBadge: React.FC<{ day: number; big: boolean }> = ({ day, big }) => (
         borderRadius: big ? 26 : 14,
       }}
     >
-      DAY {day}
+      {text ?? `DAY ${day}`}
     </div>
   </div>
 );
@@ -112,7 +112,7 @@ export const DayVideo: React.FC<DayProps> = (p) => {
             body = (
               <>
                 <Clip dir={p.dir} name={v.clip} start={v.start} clipSec={p.clips[v.clip]} slotFrames={dur} />
-                {v.tag ? (i === 0 && !op ? <div style={{ position: "absolute", inset: 0, translate: "0px 180px" }}><DayTag text={v.tag} /></div> : <DayTag text={v.tag} />) : null}              </>
+                {v.tag ? (i === 0 && !op && !p.badge ? <div style={{ position: "absolute", inset: 0, translate: "0px 180px" }}><DayTag text={v.tag} /></div> : <DayTag text={v.tag} />) : null}              </>
             );
           } else if ("clips" in v) {
             const part = Math.floor(dur / v.clips.length);
@@ -156,8 +156,8 @@ export const DayVideo: React.FC<DayProps> = (p) => {
             </Sequence>
           );
         })}
-        {op ? (
-          <DayBadge day={p.day} big={false} />
+        {op || p.badge ? (
+          <DayBadge day={p.day} big={false} text={p.badge} />
         ) : (
           <>
             <Sequence durationInFrames={firstLineEnd}>

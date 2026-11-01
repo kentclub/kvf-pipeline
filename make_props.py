@@ -11,6 +11,6 @@ for n in names:
     shutil.copy(f'work/{n}.mp4',f'{pub}/{n}.mp4'); clips[n]=dur(f'work/{n}.mp4')
 shutil.copy(f'{d}/vo.wav',f'{pub}/vo.wav')
 im=Image.open(f'raw/{s.get("before_image","IMG_0624.JPG")}').convert('RGB'); im.thumbnail((900,1600)); im.save(f'{pub}/before.jpg',quality=90)
-props={'dir':d,'day':s['day'],'goalText':s.get('goal_text','10% BODY FAT'),'clips':clips,'lines':s['lines'],**t}
+props={'dir':d,'day':s['day'],'goalText':s.get('goal_text','10% BODY FAT'),**({'badge':s['badge']} if s.get('badge') else {}),'clips':clips,'lines':s['lines'],**t}
 json.dump(props,open(f'{pub}/props.json','w'),indent=1)
 print('ok',clips)
