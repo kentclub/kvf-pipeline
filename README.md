@@ -2,6 +2,8 @@
 
 Start with `docs/SYSTEM.md`: the map of the whole system (parts, daily timeline, where state lives, what to check when it breaks). This file is the build manual only.
 
+The rules on what a video may say and show (voice, structure, numbers, on-screen text, cover, caption) are not in this repo. They live in one place, the Notion page "KvF · Rules": https://app.notion.com/p/41952293db0b811cab58debdeb8824b6. Every task fetches it first and it wins over this file.
+
 Build manual for the daily "Kent vs Fat" Short (1080x1920, 30 fps). Input is one approved episode row in the Notion table "KvF · Content & Analytics". Output is `dayN/dayN_final.mp4` and `dayN/dayN_cover.jpg`. This repo does not decide what the video says; the script, the shot list and the cover come from the Notion row.
 
 ## Setup
@@ -58,43 +60,34 @@ See `examples/script.json`. Fields:
 - `day`, `date`
 - `opener`: clip id of the filmed "Day N" selfie, or `null`. `opener_hint`: his exact words, for Whisper. With `null`, line 1 is the series line over a clip and gets the big badge.
 - `before_image`: optional, defaults to `IMG_0624.JPG`.
-- `cover`: `hook` (one word in *stars*), `at` (seconds into the opener), optional `clip` when there is no opener, `badge` (default `DAY N`; Monday recaps use `WEEK N`), optional `zoom`, `y`.
+- `cover`: `hook` (one word in *stars*), `at` (seconds into the opener), optional `clip` when there is no opener, `badge` (always `DAY N`), optional `zoom`, `y`.
 - `lines[]`: `text` and `visual`. Visual is one of:
-  - `{clip, start?, tag?}`: one clip, start in seconds, optional corner tag like `GYM DAY`.
+  - `{clip, start?, tag?}`: one clip, start in seconds, optional corner tag, only for info the voice does not give.
   - `{clips[], starts[]?, tags[]?}`: several clips in a row.
   - `{card: "meal", label, items[], over?}`
   - `{card: "totals", kcal, protein, deficit, over?}`: counts up on the spoken numbers.
   - `{card: "progress", kg, of, pct, over?}`: fat lost toward the goal only.
-  - `{card: "week", days: [{d, v}], over?}`: Monday recap bars, lime = deficit, red = over.
+  - `{card: "week", days: [{d, v}], over?}`: weekly bars, lime = deficit, red = over. Not in use: the weekly recap format is retired.
   - `{card: "balance", saved, savedLabel, lost, lostLabel, net, over?}`
   - `{card: "scan", label, rows: [{k, a, b}], over?}`
-  - `over: {clip, start?}` puts the card as a panel on a clip so a human stays visible. Full dark card only when there is no clip at all.
+  - `over: {clip, start?}` puts the card as a panel on a clip so a human stays visible. Always set it: full dark cards are not allowed.
 
-## Style rules (locked)
+## Style rules
 
-- Inter Black, lime `#D4FF3A`, dark `#0E0F0C`. Captions uppercase, word by word, active word in lime, at y 1290. Captions on every line, cards included.
-- Opener: big `DAY N` badge. "from this" = `IMG_0624` with `LAST YEAR`, "to this" = `10% BODY FAT` card.
-- No clip below ~0.7x speed. Split a long line into sentence lines, each with its own clip.
-- Each clip once. Him eating at most once per video. No second selfie right after the opener. The teaser may use a clip from the next day.
-- Last clip holds through the tail. No black frame at the loop point.
-- Numbers a card shows are not read aloud.
+Moved. Every rule on what a video may say and show is in the Notion page "KvF · Rules" (https://app.notion.com/p/41952293db0b811cab58debdeb8824b6), sections 6 (visuals and on-screen text) and 7 (cover). Do not copy rules back into this file.
+
+Build notes that are layout facts, not rules:
+
+- Captions sit at y 1290. Cover content stays inside y 240 to 1680.
+- Opener with a filmed selfie: "from this" = `IMG_0624` with `LAST YEAR`, "to this" = `10% BODY FAT` card.
 - Screenshots: build a 1080x1920 still on `#0E0F0C`, content between y 200 and 1200, 80 px side margins, `ffmpeg -loop 1 -i still.png -t 8 -vf fps=30,format=yuv420p work/NAME.mp4`.
-- Monday video = weekly recap, scan to scan, with the `week` card, badge `WEEK N` (week 1 = 28 Sep to 4 Oct). See the `week`, `balance`, `scan` cards.
-- Cover: face frame, `DAY N` badge top, hook bottom, all inside y 240 to 1680.
+- The renderer slows a clip that is shorter than its line (`kvf-video/src/DayVideo.tsx`, Clip). The rules allow 1.0x only, so check clip length against line length before rendering.
 
 ## Posting (Metricool, brand 7360889, brand timezone America/New_York)
 
 - Final and cover go into `KvF Inbox` (device_commit_files through the Mac; the folder's path on the Mac is in the task prompt). Read their ids from the folder page, media = `https://drive.usercontent.google.com/download?id=<id>&export=download&confirm=t`, `videoThumbnailUrl` = the cover link.
 - YouTube Short: public, not for kids, PEOPLE_BLOGS, tags `skinny fat, fat loss, cutting, AI coach`. Instagram Reel on feed. `instagramData.isAiGenerated` and `youtubeData.isAiGeneratedContent` stay false.
-- Caption:
-  ```
-  Day N of following AI until I reach 10% body fat.
-  <Gym day|Rest day>. <kcal> kcal, <protein>g protein, <deficit> kcal deficit.
-  Fat lost so far: <kg> kg. <10.4 - kg> kg to go.
-  Tomorrow: <teaser>.
-  #skinnyfat #fatloss #cutting #fitnessjourney #aicoach
-  ```
-  "kg to go" = 10.4 minus fat lost so far, never the 10.4 total. Numbers come from the row's related Daily Life Log entry.
+- Caption: the row's `## Caption` block. Its layout is section 8 of the Rules page.
 - Mac unreachable: Notion uploads cap at 20 MiB. Re-encode if needed (`-b:v 3900k`, two-pass), upload the final and the cover to the episode row with `notion-create-file-upload`, embed them, get signed links with `notion-get-file-download-urls`, schedule within 5 minutes. Metricool copies the media at creation.
 - After scheduling: move that day's clips and memo into `KvF Inbox/_library`, the final and cover into `KvF Inbox/_finals`, and write the `used` lines into `_system/described/` (docs/catalog.md). Metricool already has its copy.
 

@@ -36,7 +36,7 @@ all day   phone → Drive root            Kent films, uploads land in KvF Inbox
 23:16     Analytics                     Scheduled → Posted, URLs, 2d/7d snapshots, YT watch windows once their data exists
 ```
 
-Weekends get no separate video; Monday's video is the weekly recap (scan day).
+One episode per day, weekends included. There is no weekly recap format.
 
 ## Metrics: sources and delays
 
@@ -57,7 +57,8 @@ Traps:
 
 ## Where state lives
 
-- Rules and identity: Claude project memory (channel rules, pipeline map, meal plan, recipes). Agents read, only the chats write.
+- Rules: the Notion page "KvF · Rules" (https://app.notion.com/p/41952293db0b811cab58debdeb8824b6). One place for everything a video may say and show. The scriptwriter, builder and insight tasks fetch it first on every run; it wins over task prompts, this repo and memory. To change a rule, edit that page and nothing else.
+- Identity and context: Claude project memory (pipeline map, meal plan, recipes, logs). Agents read, only the chats write. Memory does not hold rules.
 - Running data: Notion. Episode status flow: Draft → Script ready → Ready to publish → Scheduled → Posted, or Blocked.
 - Clips: Drive. Folder = state (root today, `_library` cataloged). Catalog = description (`_system/clips.jsonl`, one JSON line per clip, append only, last line per id wins). Nobody renames originals.
 - Problems: every problem an agent hits becomes a row in "KvF · Operations" (Issue, Component, Status, Symptoms, Fix, Prevention). Check there before debugging anything twice.
@@ -65,12 +66,12 @@ Traps:
 
 ## Hard rules every agent follows
 
+Content rules (voice, names, numbers, visuals, cover, caption) are in the "KvF · Rules" page, not here. The system rules:
+
 - Nothing is scheduled or published without Kent's explicit OK on the finished video.
-- Scripts say "my wife", never her name. No dates, weekdays or city names in a reel.
-- Numbers come from the Life log row. Estimates stay labeled as estimates. No invented feelings, coach instructions or footage.
 - A clip is what its catalog line says it is. If the shot list claims otherwise, the catalog wins and the clip is treated as missing.
 - Agents never write to a Notion table they do not own, never message anyone but Kent, never edit the repo from a scheduled run (put the fix in an Operations row).
-- When a brief conflicts with a guardrail, the guardrail wins; log it in Operations and say so to Kent.
+- When a brief conflicts with the Rules page or a guardrail, the rule wins; log it in Operations and say so to Kent.
 
 ## When it breaks
 
@@ -89,7 +90,7 @@ Traps:
 
 ## Reading order for a new agent
 
-1. This file.
+1. The "KvF · Rules" page in Notion, then this file.
 2. `docs/catalog.md` if you touch clips.
 3. `README.md` if you build video.
 4. Your own task prompt (`docs/*-task.md`). Anything touching numbers: "Metrics: sources and delays" above.
